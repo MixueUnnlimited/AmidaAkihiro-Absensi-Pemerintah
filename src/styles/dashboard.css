@@ -1,0 +1,241 @@
+.dashboard-layout{
+  display:flex;
+  min-height:100vh;
+  background:#f1f5f9;
+}
+
+.sidebar{
+  width:260px;
+  background:#0f172a;
+  color:white;
+  padding:25px;
+}
+
+.logo{
+  margin-bottom:40px;
+}
+
+.logo span{
+  color:#60a5fa;
+}
+
+.sidebar nav{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.sidebar button{
+  border:none;
+  background:none;
+  color:white;
+  text-align:left;
+  padding:14px;
+  cursor:pointer;
+  border-radius:10px;
+}
+
+.sidebar button:hover{
+  background:#1e293b;
+}
+
+.main-content{
+  flex:1;
+  padding:30px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+
+.profile{
+  text-align:right;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:
+  repeat(auto-fit,minmax(220px,1fr));
+
+  gap:20px;
+}
+
+.stat-card{
+  background:white;
+  border-radius:15px;
+  padding:25px;
+
+  box-shadow:
+  0 10px 25px rgba(0,0,0,.08);
+}
+
+.action-box{
+  margin-top:30px;
+
+  background:white;
+
+  padding:25px;
+
+  border-radius:15px;
+}
+
+.action-buttons{
+  display:flex;
+  gap:15px;
+  margin-top:15px;
+}
+
+.action-buttons button{
+  border:none;
+  padding:14px 25px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.absen-masuk{
+  background:#2563eb;
+  color:white;
+}
+
+.absen-pulang{
+  background:#16a34a;
+  color:white;
+}
+
+.logout{
+  background:#dc2626;
+  color:white;
+}
+
+/* WRAPPER CARD */
+.absensi-table-wrapper {
+  margin-top: 30px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* TITLE */
+.absensi-table-wrapper h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+}
+
+/* TABLE */
+.absensi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* HEADER */
+.absensi-table thead {
+  background: #f4f6f8;
+}
+
+.absensi-table th {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  color: #444;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* ROW */
+.absensi-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* HOVER EFFECT */
+.absensi-table tr:hover {
+  background: #f9fbfd;
+}
+
+/* STATUS BADGE */
+.status {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* WARNA STATUS */
+.status.hadir {
+  background: #e6f7ee;
+  color: #1a7f37;
+}
+
+.status.telat {
+  background: #fff4e5;
+  color: #b26a00;
+}
+
+.status.izin {
+  background: #e7f0ff;
+  color: #1d4ed8;
+}
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.admin-layout {
+  padding: 20px;
+  background: #0f172a;
+  min-height: 100vh;
+  color: white;
+}
+
+.table-wrapper {
+  margin-top: 20px;
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #334155;
+  padding: 10px;
+  text-align: left;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #334155;
+}
+
+tr:hover {
+  background: #273449;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #1e293b;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+}

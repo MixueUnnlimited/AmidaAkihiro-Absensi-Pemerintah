@@ -1,0 +1,38 @@
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: #111827;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+/* tombol menu */
+.sidebar button {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* hover */
+.sidebar button:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* active menu */
+.sidebar button.active {
+  background: #2563eb;
+  color: white;
+}
