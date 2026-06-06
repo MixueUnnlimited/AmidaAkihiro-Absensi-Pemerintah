@@ -3,9 +3,21 @@ import { supabase } from "../services/supabase";
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
+  const [pegawai, setPegawai] = useState([]);
+  const [absensi, setAbsensi] = useState([]);
 
-  const [data, setData] = useState([]);
+  // =========================
+  // WIB DATE (STABLE FIX)
+  // =========================
+  const getWIBDate = () => {
+    const now = new Date();
+    const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    return wib.toISOString().split("T")[0];
+  };
 
+  // =========================
+  // ACCESS CHECK
+  // =========================
   useEffect(() => {
     checkAccess();
   }, []);
@@ -24,26 +36,92 @@ export default function AdminDashboard() {
       .eq("id", auth.user.id)
       .maybeSingle();
 
-    // ❌ kalau bukan admin → tendang
     if (!roleData || roleData.role !== "admin") {
       alert("Kamu bukan admin!");
       window.location.href = "/dashboard";
       return;
     }
 
-    loadData();
+    await loadData();
     setLoading(false);
   };
 
+  // =========================
+  // REALTIME (SAFE VERSION)
+  // =========================
+  useEffect(() => {
+    const channel = supabase
+      .channel("absensi-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "absensi",
+        },
+        (payload) => {
+          console.log("REALTIME:", payload);
+
+          // ❗ prevent spam reload
+          setTimeout(() => {
+            loadData();
+          }, 200);
+        }
+      )
+      .subscribe((status) => {
+        console.log("Realtime status:", status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // =========================
+  // LOAD DATA (FIXED CLEAN)
+  // =========================
   const loadData = async () => {
-    const { data } = await supabase
+    const today = getWIBDate();
+
+    // reset dulu biar tidak “ketumpuk UI”
+    setAbsensi([]);
+
+    const { data: pegawaiData } = await supabase
+      .from("pegawai")
+      .select("*");
+
+    const { data: absensiData } = await supabase
       .from("absensi")
       .select("*")
-      .order("tanggal", { ascending: false });
+      .eq("tanggal", today);
 
-    setData(data || []);
+    const merged = (absensiData || []).map((a) => {
+      const peg = pegawaiData?.find((p) => p.id === a.pegawai_id);
+
+      return {
+        ...a,
+        nama: peg?.nama || "Tidak ditemukan",
+        jabatan: peg?.jabatan || "-",
+      };
+    });
+
+    setPegawai(pegawaiData || []);
+    setAbsensi(merged);
   };
 
+  // =========================
+  // STATUS
+  // =========================
+  const getStatus = (jamMasuk) => {
+    if (!jamMasuk) return "Alpha";
+
+    const jam = new Date(jamMasuk).getHours();
+    return jam <= 8 ? "Hadir" : "Telat";
+  };
+
+  // =========================
+  // UI
+  // =========================
   if (loading) return <h2>Checking access...</h2>;
 
   return (
@@ -53,18 +131,40 @@ export default function AdminDashboard() {
       <table border="1">
         <thead>
           <tr>
+            <th>Nama</th>
+            <th>Jabatan</th>
             <th>Tanggal</th>
+            <th>Jam Masuk</th>
+            <th>Jam Pulang</th>
             <th>Status</th>
           </tr>
         </thead>
 
         <tbody>
-          {data.map((item) => (
-            <tr key={item.id}>
-              <td>{item.tanggal}</td>
-              <td>{item.status}</td>
+          {absensi.length > 0 ? (
+            absensi.map((a) => (
+              <tr key={a.id}>
+                <td>{a.nama}</td>
+                <td>{a.jabatan}</td>
+                <td>{a.tanggal}</td>
+                <td>
+                  {a.jam_masuk
+                    ? new Date(a.jam_masuk).toLocaleTimeString("id-ID")
+                    : "-"}
+                </td>
+                <td>
+                  {a.jam_pulang
+                    ? new Date(a.jam_pulang).toLocaleTimeString("id-ID")
+                    : "-"}
+                </td>
+                <td>{getStatus(a.jam_masuk)}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6">Belum ada absensi hari ini</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

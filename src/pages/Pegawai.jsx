@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
+import { absenMasuk, absenPulang } from "../services/absensi";
 
 export default function Pegawai() {
   const [pegawai, setPegawai] = useState([]);
@@ -13,17 +14,9 @@ export default function Pegawai() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("Semua");
 
-  const handleEditStart = (p) => {
-    setEditId(p.id);
-    setNama(p.nama);
-    setJabatan(p.jabatan);
-    setStatus(p.status || "Aktif");
-  };
-
-  useEffect(() => {
-    loadPegawai();
-  }, []);
-
+  // =====================
+  // LOAD DATA
+  // =====================
   const loadPegawai = async () => {
     const { data, error } = await supabase
       .from("pegawai")
@@ -39,33 +32,25 @@ export default function Pegawai() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    loadPegawai();
+  }, []);
+
   // =====================
-  // TAMBAH / UPDATE PEGAWAI
+  // EDIT START
+  // =====================
+  const handleEditStart = (p) => {
+    setEditId(p.id);
+    setNama(p.nama);
+    setJabatan(p.jabatan);
+    setStatus(p.status || "Aktif");
+  };
+
+  // =====================
+  // UPDATE
   // =====================
   const handleUpdatePegawai = async () => {
     if (!editId) return;
-
-    const handleDeletePegawai = async (id) => {
-  const konfirmasi = window.confirm(
-    "Yakin ingin menghapus pegawai ini?"
-  );
-
-  if (!konfirmasi) return;
-
-  const { error } = await supabase
-    .from("pegawai")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  alert("Pegawai berhasil dihapus!");
-
-  loadPegawai();
-};
 
     const { error } = await supabase
       .from("pegawai")
@@ -83,7 +68,6 @@ export default function Pegawai() {
 
     alert("Pegawai berhasil diupdate!");
 
-    // reset
     setEditId(null);
     setNama("");
     setJabatan("");
@@ -92,6 +76,30 @@ export default function Pegawai() {
     loadPegawai();
   };
 
+  // =====================
+  // DELETE
+  // =====================
+  const handleDeletePegawai = async (id) => {
+    const konfirmasi = window.confirm("Yakin ingin menghapus pegawai ini?");
+    if (!konfirmasi) return;
+
+    const { error } = await supabase
+      .from("pegawai")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Pegawai berhasil dihapus!");
+    loadPegawai();
+  };
+
+  // =====================
+  // ADD
+  // =====================
   const handleAddPegawai = async (e) => {
     e.preventDefault();
 
@@ -113,7 +121,6 @@ export default function Pegawai() {
 
     alert("Pegawai berhasil ditambahkan!");
 
-    // reset form
     setNama("");
     setJabatan("");
     setStatus("Aktif");
@@ -121,41 +128,68 @@ export default function Pegawai() {
     loadPegawai();
   };
 
+  // =====================
+  // ABSEN HANDLER (BIAR AMAN)
+  // =====================
+  const handleAbsenMasuk = async (id) => {
+    try {
+      await absenMasuk(id);
+      alert("Absen masuk berhasil");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAbsenPulang = async (id) => {
+    try {
+      await absenPulang(id);
+      alert("Absen pulang berhasil");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   if (loading) return <h2>Loading Pegawai...</h2>;
 
+  // =====================
+  // FILTER
+  // =====================
   const filteredPegawai = pegawai.filter((p) => {
-  const cocokNama = p.nama
-    .toLowerCase()
-    .includes(search.toLowerCase());
+    const cocokNama = p.nama
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-  const cocokStatus =
-    filterStatus === "Semua" ||
-    (p.status || "Aktif") === filterStatus;
+    const cocokStatus =
+      filterStatus === "Semua" ||
+      (p.status || "Aktif") === filterStatus;
 
-  return cocokNama && cocokStatus;
-});
+    return cocokNama && cocokStatus;
+  });
 
   return (
     <div className="pegawai-page">
 
       <h2>👥 Halaman Pegawai</h2>
 
-    <input
-          type="text"
-          placeholder="🔍 Cari Pegawai..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      {/* SEARCH */}
+      <input
+        type="text"
+        placeholder="🔍 Cari Pegawai..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
       />
-    <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-     >
+
+      {/* FILTER */}
+      <select
+        value={filterStatus}
+        onChange={(e) => setFilterStatus(e.target.value)}
+      >
         <option value="Semua">Semua Status</option>
         <option value="Aktif">Aktif</option>
         <option value="Nonaktif">Nonaktif</option>
-    </select>
+      </select>
 
-      {/* ================= FORM ================= */}
+      {/* FORM */}
       <form className="pegawai-form" onSubmit={handleAddPegawai}>
 
         <input
@@ -203,12 +237,10 @@ export default function Pegawai() {
             Cancel
           </button>
         )}
-
       </form>
 
-      {/* ================= TABLE ================= */}
+      {/* TABLE */}
       <table className="pegawai-table">
-
         <thead>
           <tr>
             <th>Nama</th>
@@ -219,24 +251,28 @@ export default function Pegawai() {
         </thead>
 
         <tbody>
-          {pegawai.length > 0 ? (
+          {filteredPegawai.length > 0 ? (
             filteredPegawai.map((p) => (
               <tr key={p.id}>
                 <td>{p.nama}</td>
                 <td>{p.jabatan}</td>
                 <td>{p.status || "Aktif"}</td>
 
-                {/* ⭐ TAMBAHAN EDIT BUTTON */}
                 <td>
                   <button onClick={() => handleEditStart(p)}>
                     Edit
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeletePegawai(p.id)}
-                  >
+                  <button onClick={() => handleDeletePegawai(p.id)}>
                     Hapus
+                  </button>
+
+                  <button onClick={() => handleAbsenMasuk(p.id)}>
+                    Absen Masuk
+                  </button>
+
+                  <button onClick={() => handleAbsenPulang(p.id)}>
+                    Absen Pulang
                   </button>
                 </td>
               </tr>

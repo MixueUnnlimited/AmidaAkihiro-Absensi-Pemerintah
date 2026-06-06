@@ -43,6 +43,32 @@ export default function Dashboard() {
     loadLaporan();
   }, []);
 
+  useEffect(() => {
+  const channel = supabase
+    .channel("laporan-realtime")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "absensi",
+      },
+      (payload) => {
+        console.log("LAPORAN REALTIME:", payload);
+
+        setTimeout(() => {
+          loadLaporan();
+          loadAbsensi(); // sekalian update menu Absensi
+        }, 300);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
+
   const simpanProfil = async () => {
   if (!pegawai) return;
 
@@ -299,43 +325,52 @@ export default function Dashboard() {
           <div className="absensi-table-wrapper">
             <h2>Laporan Absensi</h2>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "20px",
-                marginBottom: "20px",
-                alignItems: "flex-end",
-              }}
-            >
-              <div>
-                <label style={{ display: "block", marginBottom: "5px" }}>Dari Tanggal</label>
-                <input
-                  type="date"
-                  value={tanggalAwal}
-                  onChange={(e) => setTanggalAwal(e.target.value)}
-                />
-              </div>
+            <div style={{
+  display: "flex",
+  gap: "15px",
+  alignItems: "flex-end",
+  marginBottom: "20px",
+  flexWrap: "wrap"
+}}>
 
-              <div>
-                <label style={{ display: "block", marginBottom: "5px" }}>Sampai Tanggal</label>
-                <input
-                  type="date"
-                  value={tanggalAkhir}
-                  onChange={(e) => setTanggalAkhir(e.target.value)}
-                />
-              </div>
-            </div>
+  <div>
+    <label style={{ display: "block", marginBottom: "5px" }}>
+      Dari Tanggal
+    </label>
+    <input
+      type="date"
+      value={tanggalAwal}
+      onChange={(e) => setTanggalAwal(e.target.value)}
+    />
+  </div>
 
-            <button
-              onClick={exportExcel}
-              style={{
-                height: "40px",
-                padding: "0 15px",
-                cursor: "pointer",
-              }}
-            >
-              Export Excel
-            </button>
+  <div>
+    <label style={{ display: "block", marginBottom: "5px" }}>
+      Sampai Tanggal
+    </label>
+    <input
+      type="date"
+      value={tanggalAkhir}
+      onChange={(e) => setTanggalAkhir(e.target.value)}
+    />
+  </div>
+
+  <button
+    onClick={exportExcel}
+    style={{
+      height: "40px",
+      padding: "0 15px",
+      cursor: "pointer",
+      background: "#2563eb",
+      color: "white",
+      border: "none",
+      borderRadius: "8px"
+    }}
+  >
+    Export Excel
+  </button>
+
+</div>
 
             <table className="absensi-table">
               <thead>
@@ -364,58 +399,47 @@ export default function Dashboard() {
         )}
 
         {menu === "pengaturan" && (
-          <div className="absensi-table-wrapper">
-            <h2>Pengaturan Akun</h2>
+  <div className="settings-wrapper">
 
-            <div style={{ marginBottom: "15px" }}>
-              <label>Nama Pegawai</label>
-              <input
-                type="text"
-                value={namaEdit}
-                onChange={(e) => setNamaEdit(e.target.value)}
-              />
-            </div>
+    <h2>⚙️ Pengaturan Akun</h2>
 
-            <div style={{ marginBottom: "15px" }}>
-              <label>Jabatan</label>
-              <input
-                type="text"
-                value={jabatanEdit}
-                onChange={(e) => setJabatanEdit(e.target.value)}
-              />
-            </div>
+    <div className="settings-field">
+      <label>Nama Pegawai</label>
+      <input
+        type="text"
+        value={namaEdit}
+        onChange={(e) => setNamaEdit(e.target.value)}
+      />
+    </div>
 
-            <div style={{ marginBottom: "15px" }}>
-              <label>Status</label>
-              <input
-                type="text"
-                value={pegawai?.status || "Aktif"}
-                readOnly
-                style={{
-                  display: "block",
-                  width: "300px",
-                  padding: "8px",
-                  marginTop: "5px",
-                }}
-              />
-            </div>
+    <div className="settings-field">
+      <label>Jabatan</label>
+      <input
+        type="text"
+        value={jabatanEdit}
+        onChange={(e) => setJabatanEdit(e.target.value)}
+      />
+    </div>
 
-            <button
-              onClick={simpanProfil}
-              style={{
-                  marginRight: "10px",
-                  padding: "10px 15px",
-                  cursor: "pointer",
-                }}
-              >
-                  Simpan Perubahan
-            </button>
+    <div className="settings-field">
+      <label>Status</label>
+      <div className="settings-status">
+        {pegawai?.status || "Aktif"}
+      </div>
+    </div>
 
-            <button className="logout" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        )}
+    <div className="settings-actions">
+      <button className="settings-save" onClick={simpanProfil}>
+        Simpan Perubahan
+      </button>
+
+      <button className="settings-logout" onClick={handleLogout}>
+        Logout
+      </button>
+    </div>
+
+  </div>
+)}
       </main>
     </div>
   );
