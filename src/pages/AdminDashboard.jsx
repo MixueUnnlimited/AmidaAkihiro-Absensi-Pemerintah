@@ -46,6 +46,11 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+    const handleLogout = async () => {
+      await supabase.auth.signOut();
+      window.location.href = "/";
+  };
+
   // =========================
   // REALTIME (SAFE VERSION)
   // =========================
@@ -93,7 +98,7 @@ export default function AdminDashboard() {
     const { data: absensiData } = await supabase
       .from("absensi")
       .select("*")
-      .eq("tanggal", today);
+      .order("tanggal", { ascending: false });
 
     const merged = (absensiData || []).map((a) => {
       const peg = pegawaiData?.find((p) => p.id === a.pegawai_id);
@@ -125,8 +130,21 @@ export default function AdminDashboard() {
   if (loading) return <h2>Checking access...</h2>;
 
   return (
-    <div>
+  <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px",
+      }}
+    >
       <h1>Admin Dashboard</h1>
+
+      <button onClick={handleLogout}>
+        Logout
+      </button>
+    </div>
 
       <table border="1">
         <thead>
