@@ -2,6 +2,8 @@ import { useState } from "react";
 import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
 
+import logoCemara from "../assets/logo-cemara.png";
+
 import "../styles/login.css";
 
 export default function Login() {
@@ -61,9 +63,15 @@ export default function Login() {
       <div className="login-card">
 
         <div className="login-header">
-          <h1>Sistem Absensi Pemerintah</h1>
-          <p>Silakan masuk ke akun Anda</p>
-        </div>
+  <img
+    src={logoCemara}
+    alt="Logo Pemerintah Cemara"
+    className="login-logo"
+  />
+
+  <h1>Sistem Absensi Pemerintah Cemara</h1>
+  <p>Silakan masuk ke akun Anda</p>
+</div>
 
         <form onSubmit={handleLogin}>
           <div className="input-group">
