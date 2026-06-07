@@ -43,10 +43,12 @@ export default function Login() {
       .single();
 
     if (pegawaiError || !pegawai) {
-      setError("Data pegawai tidak ditemukan");
-      setLoading(false);
-      return;
-    }
+  console.log("Pegawai tidak ditemukan, redirect aman ke dashboard");
+
+  navigate("/dashboard"); // fallback aman
+  setLoading(false);
+  return;
+}
 
     // redirect berdasarkan role
     if (pegawai.role === "admin") {

@@ -31,9 +31,9 @@ export default function AdminDashboard() {
     }
 
     const { data: roleData } = await supabase
-      .from("profiles")
+      .from("pegawai")
       .select("role")
-      .eq("id", auth.user.id)
+      .eq("user_id", auth.user.id)
       .maybeSingle();
 
     if (!roleData || roleData.role !== "admin") {
