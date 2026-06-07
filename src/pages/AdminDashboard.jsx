@@ -129,32 +129,78 @@ export default function AdminDashboard() {
   // =========================
   if (loading) return <h2>Checking access...</h2>;
 
+  const headerStyle = {
+  backgroundColor: "#1e3a5f",
+  color: "white",
+  padding: "12px",
+  textAlign: "left",
+};
+
+const cellStyle = {
+  padding: "12px",
+  borderBottom: "1px solid #ddd",
+};
+
   return (
-  <div>
+  <div
+    style={{
+      minHeight: "100vh",
+      backgroundColor: "#f4f6f9",
+      padding: "30px",
+    }}
+  >
     <div
       style={{
+        backgroundColor: "#1e3a5f",
+        color: "white",
+        padding: "20px",
+        borderRadius: "10px",
+        marginBottom: "20px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "20px",
       }}
     >
-      <h1>Admin Dashboard</h1>
+      <h1 style={{ margin: 0 }}>Admin Dashboard</h1>
 
-      <button onClick={handleLogout}>
+      <button
+        onClick={handleLogout}
+        style={{
+          backgroundColor: "#dc3545",
+          color: "white",
+          border: "none",
+          padding: "10px 20px",
+          borderRadius: "6px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
         Logout
       </button>
     </div>
 
-      <table border="1">
+    <div
+      style={{
+        backgroundColor: "white",
+        padding: "20px",
+        borderRadius: "10px",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+      }}
+    >
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+        }}
+      >
         <thead>
           <tr>
-            <th>Nama</th>
-            <th>Jabatan</th>
-            <th>Tanggal</th>
-            <th>Jam Masuk</th>
-            <th>Jam Pulang</th>
-            <th>Status</th>
+            <th style={headerStyle}>Nama</th>
+            <th style={headerStyle}>Jabatan</th>
+            <th style={headerStyle}>Tanggal</th>
+            <th style={headerStyle}>Jam Masuk</th>
+            <th style={headerStyle}>Jam Pulang</th>
+            <th style={headerStyle}>Status</th>
           </tr>
         </thead>
 
@@ -162,29 +208,35 @@ export default function AdminDashboard() {
           {absensi.length > 0 ? (
             absensi.map((a) => (
               <tr key={a.id}>
-                <td>{a.nama}</td>
-                <td>{a.jabatan}</td>
-                <td>{a.tanggal}</td>
-                <td>
+                <td style={cellStyle}>{a.nama}</td>
+                <td style={cellStyle}>{a.jabatan}</td>
+                <td style={cellStyle}>{a.tanggal}</td>
+
+                <td style={cellStyle}>
                   {a.jam_masuk
                     ? new Date(a.jam_masuk).toLocaleTimeString("id-ID")
                     : "-"}
                 </td>
-                <td>
+
+                <td style={cellStyle}>
                   {a.jam_pulang
                     ? new Date(a.jam_pulang).toLocaleTimeString("id-ID")
                     : "-"}
                 </td>
-                <td>{getStatus(a.jam_masuk)}</td>
+
+                <td style={cellStyle}>{getStatus(a.jam_masuk)}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6">Belum ada absensi hari ini</td>
+              <td style={cellStyle} colSpan="6">
+                Belum ada data absensi
+              </td>
             </tr>
           )}
         </tbody>
       </table>
     </div>
-  );
+  </div>
+);
 }
