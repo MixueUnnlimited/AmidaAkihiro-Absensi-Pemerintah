@@ -314,8 +314,8 @@ export default function Dashboard() {
               <tbody>
                 {absensi.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.tanggal}</td>
                     <td>{item.pegawai?.nama || "-"}</td>
+                    <td>{item.tanggal}</td>
                     <td>{item.jam_masuk ? formatWIB(item.jam_masuk) : "-"}</td>
                     <td>{item.jam_pulang ? formatWIB(item.jam_pulang) : "-"}</td>
                     <td>{item.status}</td>
