@@ -148,7 +148,12 @@ export default function Dashboard() {
   const loadAbsensi = async () => {
     const { data, error } = await supabase
       .from("absensi")
-      .select("*")
+      .select(`
+            *,
+            pegawai (
+            nama
+        )
+      `)
       .order("tanggal", { ascending: false });
 
     if (error) {
@@ -299,6 +304,7 @@ export default function Dashboard() {
               <thead>
                 <tr>
                   <th>Tanggal</th>
+                  <th>Nama Pegawai</th>
                   <th>Jam Masuk</th>
                   <th>Jam Pulang</th>
                   <th>Status</th>
@@ -309,6 +315,7 @@ export default function Dashboard() {
                 {absensi.map((item) => (
                   <tr key={item.id}>
                     <td>{item.tanggal}</td>
+                    <td>{item.pegawai?.nama || "-"}</td>
                     <td>{item.jam_masuk ? formatWIB(item.jam_masuk) : "-"}</td>
                     <td>{item.jam_pulang ? formatWIB(item.jam_pulang) : "-"}</td>
                     <td>{item.status}</td>
